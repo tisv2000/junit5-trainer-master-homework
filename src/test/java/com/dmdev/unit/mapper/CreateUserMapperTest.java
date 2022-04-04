@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CreateUserMapperTest {
 
     @Test
-    void map() {
+    void mapCreateUserDtoToUserEntity() {
+        // GIVEN
         var createUserDto = CreateUserDto.builder()
                 .name("Arwen")
                 .birthday("1992-07-07")
@@ -19,8 +20,10 @@ class CreateUserMapperTest {
                 .gender("FEMALE")
                 .build();
 
+        // WHEN
         var userEntity = CreateUserMapper.getInstance().map(createUserDto);
 
+        // THEN
         assertThat(userEntity.getName()).isEqualTo(createUserDto.getName());
         assertThat(userEntity.getBirthday()).isEqualTo(createUserDto.getBirthday());
         assertThat(userEntity.getEmail()).isEqualTo(createUserDto.getEmail());

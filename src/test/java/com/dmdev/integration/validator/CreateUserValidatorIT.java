@@ -14,13 +14,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateUserValidatorIT {
 
-    static CreateUserValidator createUserValidator = CreateUserValidator.getInstance();
+    private static final CreateUserValidator createUserValidator = CreateUserValidator.getInstance();
 
     @Test
     void validateCreateUserDtoWithCorrectData() {
+        // GIVEN
         var correctUserDto = userDtoBuilder().build();
 
+        // WHEN
         var validationResult = createUserValidator.validate(correctUserDto);
+
+        // THEN
         assertThat(validationResult.isValid()).isTrue();
     }
 
@@ -28,27 +32,31 @@ class CreateUserValidatorIT {
     @Tag("negative")
     @MethodSource("getArgumentsForValidateWithIncorrectDataTest")
     void validateWithIncorrectDataReturnsValidationResultWithError(
-            CreateUserDto createUserDto, String expectedErrorCode
+            CreateUserDto createUserDto, String expectedErrorCode, String expectedMessage
     ) {
+        // GIVEN
+        // WHEN
         var validationResult = createUserValidator.validate(createUserDto);
 
+        // THEN
         assertThat(validationResult.isValid()).isFalse();
         assertThat(validationResult.getErrors().get(0).getCode()).isEqualTo(expectedErrorCode);
+        assertThat(validationResult.getErrors().get(0).getMessage()).isEqualTo(expectedMessage);
     }
 
     static Stream<Arguments> getArgumentsForValidateWithIncorrectDataTest() {
         return Stream.of(
-                Arguments.of(userDtoBuilder().birthday(null).build(), "invalid.birthday"),
-                Arguments.of(userDtoBuilder().birthday("").build(), "invalid.birthday"),
-                Arguments.of(userDtoBuilder().birthday("01-01-2000").build(), "invalid.birthday"),
+                Arguments.of(userDtoBuilder().birthday(null).build(), "invalid.birthday", "Birthday is invalid"),
+                Arguments.of(userDtoBuilder().birthday("").build(), "invalid.birthday", "Birthday is invalid"),
+                Arguments.of(userDtoBuilder().birthday("01-01-2000").build(), "invalid.birthday", "Birthday is invalid"),
 
-                Arguments.of(userDtoBuilder().gender(null).build(), "invalid.gender"),
-                Arguments.of(userDtoBuilder().gender("").build(), "invalid.gender"),
-                Arguments.of(userDtoBuilder().gender("dummy").build(), "invalid.gender"),
+                Arguments.of(userDtoBuilder().gender(null).build(), "invalid.gender", "Gender is invalid"),
+                Arguments.of(userDtoBuilder().gender("").build(), "invalid.gender", "Gender is invalid"),
+                Arguments.of(userDtoBuilder().gender("dummy").build(), "invalid.gender", "Gender is invalid"),
 
-                Arguments.of(userDtoBuilder().role(null).build(), "invalid.role"),
-                Arguments.of(userDtoBuilder().role("").build(), "invalid.role"),
-                Arguments.of(userDtoBuilder().role("dummy").build(), "invalid.role")
+                Arguments.of(userDtoBuilder().role(null).build(), "invalid.role", "Role is invalid"),
+                Arguments.of(userDtoBuilder().role("").build(), "invalid.role", "Role is invalid"),
+                Arguments.of(userDtoBuilder().role("dummy").build(), "invalid.role", "Role is invalid")
         );
     }
 

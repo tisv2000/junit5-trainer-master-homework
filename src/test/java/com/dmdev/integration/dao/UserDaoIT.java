@@ -10,33 +10,49 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 public class UserDaoIT extends IntegrationTestBase {
 
-    static UserDao underTest = UserDao.getInstance();
+    private static final UserDao underTest = UserDao.getInstance();
 
     @Test
     void findAllUsersReturnsNotEmptyListIfNotEmpty() {
+        // GIVEN
+        // WHEN
         var users = underTest.findAll();
+
+        // THEN
         assertThat(users).isNotEmpty();
     }
 
     @Test
     void findByExistingIdReturnsUser() {
+        // GIVEN
+        // WHEN
         var user = underTest.findById(1);
+
+        // THEN
         assertThat(user).isPresent();
         assertThat(user.get().getEmail()).isEqualTo("ivan@gmail.com");
     }
 
     @Test
     void findByExistingEmailAndPasswordReturnsUser() {
-        var user = underTest.findByEmailAndPassword("petr@gmail.com", "123");
-        assertThat(user).isPresent();;
-        assertThat(user.get().getName()).isEqualTo("Petr");
+        // GIVEN
+        var email = "petr@gmail.com";
+        var password = "123";
+        var expectedName = "Petr";
+
+        // WHEN
+        var user = underTest.findByEmailAndPassword(email, password);
+
+        // THEN
+        assertThat(user).isPresent();
+        assertThat(user.get().getName()).isEqualTo(expectedName);
     }
 
     @Test
     void saveUserInDataBase() {
+        // GIVEN
         var newName = "Frodo";
         var newUser = User
                 .builder()
@@ -48,25 +64,36 @@ public class UserDaoIT extends IntegrationTestBase {
                 .gender(Gender.MALE)
                 .build();
 
+        // WHEN
         var savedUser = underTest.save(newUser);
+
+        // THEN
         assertThat(savedUser.getId()).isGreaterThan(1);
         assertThat(savedUser.getName()).isEqualTo(newName);
     }
 
     @Test
     void deleteUserById() {
+        // GIVEN
+        // WHEN
         var isUserDeleted = underTest.delete(1);
+
+        // THEN
         assertThat(isUserDeleted).isTrue();
         assertThat(underTest.findById(1)).isEmpty();
     }
 
     @Test
     void updateUser() {
+        // GIVEN
         var user = underTest.findById(1).get();
         var newName = "John";
         user.setName(newName);
+
+        // WHEN
         underTest.update(user);
+
+        // THEN
         assertThat(underTest.findById(1).get().getName()).isEqualTo(newName);
     }
-
 }
